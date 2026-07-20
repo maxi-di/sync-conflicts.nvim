@@ -37,15 +37,11 @@ hand.
 
 ## Installation
 
-This is a local/unpublished plugin — clone or copy it into your Neovim
-config and load it by path.
-
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
 return {
-  dir = vim.fn.stdpath("config") .. "/local-plugins/sync-conflicts.nvim",
-  name = "sync-conflicts",
+  "maxi-di/sync-conflicts.nvim",
   config = true,
   cmd = "SyncConflicts",
 }
@@ -55,8 +51,7 @@ With custom options:
 
 ```lua
 return {
-  dir = vim.fn.stdpath("config") .. "/local-plugins/sync-conflicts.nvim",
-  name = "sync-conflicts",
+  "maxi-di/sync-conflicts.nvim",
   cmd = "SyncConflicts",
   opts = {
     keymaps = {
@@ -66,12 +61,6 @@ return {
     },
   },
 }
-```
-
-Place the plugin's `lua/sync-conflicts.lua` at:
-
-```
-<nvim-config>/local-plugins/sync-conflicts.nvim/lua/sync-conflicts.lua
 ```
 
 ## Usage
