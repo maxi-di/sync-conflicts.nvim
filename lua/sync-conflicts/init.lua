@@ -104,24 +104,32 @@ end
 -- Diff-вью и разрешение конфликта
 -- ─────────────────────────────────────────────────────────────
 
+local function in_plugin_diff()
+    if not vim.wo.diff then
+        return false
+    end
+    local ok, val = pcall(vim.api.nvim_tabpage_get_var, vim.api.nvim_get_current_tabpage(), "sync_conflicts_diff")
+    return ok and val == true
+end
+
 local function set_resolve_keymaps(bufnr, entry)
-    local kopts = {buffer = bufnr, silent = true, nowait = true}
+    local kopts = { buffer = bufnr, silent = true, nowait = true }
 
     vim.keymap.set("n", opts.keymaps.keep_conflict, function()
         M.keep_conflict(entry)
-    end, vim.tbl_extend("force", kopts, {desc = "Sync-conflict: оставить версию конфликта"}))
+    end, vim.tbl_extend("force", kopts, { desc = "Sync-conflict: оставить версию конфликта" }))
 
     vim.keymap.set("n", opts.keymaps.keep_original, function()
         M.keep_original(entry)
-    end, vim.tbl_extend("force", kopts, {desc = "Sync-conflict: оставить оригинал"}))
+    end, vim.tbl_extend("force", kopts, { desc = "Sync-conflict: оставить оригинал" }))
 
     vim.keymap.set("n", opts.keymaps.quit, function()
-        if not vim.wo.diff then
+        if not in_plugin_diff() then
             return
         end
         vim.cmd("diffoff!")
         vim.cmd("tabclose")
-    end, vim.tbl_extend("force", kopts, {desc = "Sync-conflict: закрыть diff"}))
+    end, vim.tbl_extend("force", kopts, { desc = "Sync-conflict: закрыть diff" }))
 end
 
 --- Открывает вертикальный diff: оригинал | конфликт, в отдельном табе
@@ -135,6 +143,8 @@ function M.open_diff(entry)
     end
 
     vim.cmd("tabnew " .. vim.fn.fnameescape(entry.original_path))
+    local tab_id = vim.api.nvim_get_current_tabpage()
+    vim.api.nvim_tabpage_set_var(tab_id, "sync_conflicts_diff", true)
     vim.cmd("diffthis")
     local orig_buf = vim.api.nvim_get_current_buf()
 
@@ -212,7 +222,7 @@ function M.pick()
             },
         })
     else
-        vim.ui.select(labels, {prompt = "Sync conflicts:"}, function(choice)
+        vim.ui.select(labels, { prompt = "Sync conflicts:" }, function(choice)
             if not choice then return end
             local e = by_label[choice]
             if e then M.open_diff(e) end
@@ -236,7 +246,7 @@ function M.setup(user_opts)
 
     vim.api.nvim_create_user_command("SyncConflicts", function()
         M.pick()
-    end, {desc = "Показать и разрешить Syncthing sync-conflict файлы в проекте"})
+    end, { desc = "Показать и разрешить Syncthing sync-conflict файлы в проекте" })
 end
 
 return M
